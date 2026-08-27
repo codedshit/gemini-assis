@@ -22,7 +22,7 @@
   "use strict";
 
   // ---- EDIT THIS LINE ONLY -------------------------------------------------
-  var GITHUB_SCRIPT_URL = "YOUR_GITHUB_PAGES_URL_HERE";
+  var GITHUB_SCRIPT_URL = "https://codedshit.github.io/gemini-assis/";
   // -------------------------------------------------------------------------
 
   var VERSION = "1.0.4"; // used for cache-busting the loaded assistant.js
