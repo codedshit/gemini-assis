@@ -17,7 +17,7 @@ window.GEMINI_ASSISTANT_CONFIG = {
    * Replace the placeholder below with your real GitHub Pages base URL.
    * The bookmarklet builds the final assistant.js URL from GITHUB_SCRIPT_URL.
    * -------------------------------------------------------------------- */
-  GITHUB_SCRIPT_URL: "YOUR_GITHUB_PAGES_URL_HERE", // e.g. "https://ash.github.io/gemini-web-assistant"
+  GITHUB_SCRIPT_URL: "https://codedshit.github.io/gemini-assis/", // e.g. "https://ash.github.io/gemini-web-assistant"
 
   /* Current assistant version. Bump this on each release so the
    * "Check for Updates" feature and cache-busting query param stay in sync. */
