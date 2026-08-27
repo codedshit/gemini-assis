@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en" class="ga-site">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0e1017" />
+  <meta name="description" content="Gemini Web Assistant — a GitHub-hosted universal AI browser assistant loaded by a tiny bookmarklet. Game/Quiz mode is its specialty." />
+  <title>Gemini Web Assistant — Bookmarklet Loader</title>
+  <style>
+    :root {
+      --bg: #0e1017;
+      --surface: #151824;
+      --surface-2: #1c2030;
+      --border: #272c3f;
+      --text: #e7e9f2;
+      --muted: #8b91a7;
+      --primary: #6366f1;
+      --accent: #22d3a5;
+      --radius: 16px;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    html.ga-site { background: var(--bg); }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      color: var(--text);
+      background:
+        radial-gradient(120% 80% at 80% -10%, color-mix(in srgb, var(--primary) 22%, transparent), transparent 60%),
+        var(--bg);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap { max-width: 900px; margin: 0 auto; padding: 48px 20px 80px; }
+    header.hero { display: flex; flex-direction: column; gap: 16px; margin-bottom: 40px; }
+    .badge {
+      align-self: flex-start;
+      font-size: 12px; font-weight: 700; letter-spacing: 1px;
+      color: var(--primary); background: color-mix(in srgb, var(--primary) 16%, transparent);
+      border: 1px solid color-mix(in srgb, var(--primary) 40%, transparent);
+      padding: 5px 12px; border-radius: 999px;
+    }
+    h1 { font-size: clamp(30px, 6vw, 52px); line-height: 1.05; margin: 0; letter-spacing: -0.02em; text-wrap: balance; }
+    h1 .mark { color: var(--primary); }
+    .lede { font-size: 18px; color: var(--muted); max-width: 60ch; text-wrap: pretty; margin: 0; }
+    h2 { font-size: 22px; margin: 40px 0 14px; letter-spacing: -0.01em; }
+    h3 { font-size: 15px; margin: 22px 0 8px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+    p { color: var(--text); }
+    a { color: var(--primary); }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin: 8px 0; }
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 18px;
+    }
+    .card .k { font-size: 22px; }
+    .card h4 { margin: 8px 0 4px; font-size: 16px; }
+    .card p { margin: 0; color: var(--muted); font-size: 14px; }
+    .panel {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 22px; margin: 14px 0;
+    }
+    label.field { display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+    input[type=text] {
+      width: 100%; font-family: var(--mono); font-size: 14px;
+      color: var(--text); background: var(--bg); border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px 13px; outline: none;
+    }
+    input[type=text]:focus { border-color: var(--primary); box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 25%, transparent); }
+    .btnrow { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+    button.btn {
+      font: inherit; font-weight: 600; font-size: 14px;
+      color: #fff; background: var(--primary); border: 1px solid var(--primary);
+      border-radius: 10px; padding: 10px 16px; cursor: pointer;
+    }
+    button.btn.secondary { background: var(--surface-2); border-color: var(--border); color: var(--text); }
+    button.btn:active { transform: scale(0.98); }
+    .drag-target {
+      display: inline-flex; align-items: center; gap: 8px;
+      margin-top: 14px; padding: 12px 18px;
+      background: var(--surface-2); border: 1px dashed var(--primary);
+      border-radius: 12px; color: var(--text); text-decoration: none; font-weight: 700;
+      cursor: grab;
+    }
+    pre {
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 12px; padding: 14px; overflow-x: auto;
+      font-family: var(--mono); font-size: 12.5px; color: var(--text);
+      white-space: pre-wrap; word-break: break-word;
+    }
+    code { font-family: var(--mono); background: var(--surface-2); padding: 1px 6px; border-radius: 6px; font-size: 0.9em; }
+    ol.steps { padding-left: 20px; }
+    ol.steps li { margin-bottom: 10px; }
+    .notice {
+      border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--border));
+      background: color-mix(in srgb, var(--accent) 12%, var(--surface));
+      border-radius: 12px; padding: 14px 16px; font-size: 14px; margin: 14px 0;
+    }
+    .warn {
+      border: 1px solid color-mix(in srgb, #f97066 45%, var(--border));
+      background: color-mix(in srgb, #f97066 12%, var(--surface));
+    }
+    footer { margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--border); color: var(--muted); font-size: 14px; }
+    .muted { color: var(--muted); }
+    .status { font-size: 13px; color: var(--accent); min-height: 18px; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header class="hero">
+      <span class="badge">GITHUB-HOSTED · BOOKMARKLET LOADER</span>
+      <h1><span class="mark">&#10022;</span> Gemini Web&nbsp;Assistant</h1>
+      <p class="lede">
+        A universal AI browser assistant that lives on GitHub and loads through a tiny bookmarklet.
+        Update the code on GitHub and every bookmark picks it up &mdash; no need to recreate the bookmark.
+        Specialized for <strong>Game / Quiz</strong> pages, and a capable general assistant everywhere else.
+      </p>
+    </header>
+
+    <section class="grid" aria-label="Modes">
+      <article class="card"><div class="k">&#128172;</div><h4>General AI</h4><p>Chat with Gemini about anything, with history and follow-ups.</p></article>
+      <article class="card"><div class="k">&#127918;</div><h4>Game / Quiz</h4><p>Detects questions &amp; choices, shows a big answer card with confidence.</p></article>
+      <article class="card"><div class="k">&#128214;</div><h4>Study</h4><p>Explanations, summaries, and practice questions.</p></article>
+      <article class="card"><div class="k">&#129504;</div><h4>Analyze Page</h4><p>Summarizes readable page content; optional image input.</p></article>
+    </section>
+
+    <h2>1. Set your GitHub Pages URL</h2>
+    <div class="panel">
+      <label class="field" for="ghurl">Your GitHub Pages base URL (no trailing slash)</label>
+      <input id="ghurl" type="text" spellcheck="false"
+        placeholder="https://YOUR-USERNAME.github.io/YOUR-REPOSITORY"
+        value="" />
+      <p class="muted" style="font-size:13px;margin:10px 0 0;">
+        Example: <code>https://ash.github.io/gemini-web-assistant</code>. This is the folder that contains
+        <code>assistant.js</code>. The generator below inserts it into your bookmarklet.
+      </p>
+      <div class="status" id="urlstatus"></div>
+    </div>
+
+    <h2>2. Grab your bookmarklet</h2>
+    <div class="panel">
+      <h3>Production bookmarklet (drag to bookmarks bar)</h3>
+      <a class="drag-target" id="dragbm" href="#" draggable="true">&#10022; Gemini Assistant</a>
+      <p class="muted" style="font-size:13px;">On desktop, drag the button above to your bookmarks bar. On iPad, use "Copy" below and paste it into a bookmark's URL (see setup).</p>
+      <div class="btnrow">
+        <button class="btn" id="copybm">Copy production bookmarklet</button>
+        <button class="btn secondary" id="copydev">Copy readable (dev) version</button>
+      </div>
+      <div class="status" id="copystatus"></div>
+      <h3 style="margin-top:22px;">Preview</h3>
+      <pre id="bmpreview">Set your URL above to generate the bookmarklet…</pre>
+    </div>
+
+    <h2>3. Create the bookmark (iPad Safari / Chrome)</h2>
+    <div class="panel">
+      <ol class="steps">
+        <li>In Safari, bookmark any page (Share &rarr; Add Bookmark) and Save.</li>
+        <li>Open <strong>Bookmarks &rarr; Edit</strong>, tap the new bookmark.</li>
+        <li>Rename it to <em>Gemini Assistant</em>.</li>
+        <li>Replace the URL by pasting the <strong>production bookmarklet</strong> you copied above.</li>
+        <li>Done &mdash; open any webpage and tap the bookmark to launch the assistant.</li>
+      </ol>
+      <div class="notice">Tapping the bookmark again while the assistant is open just re-focuses it. It never creates duplicate windows.</div>
+    </div>
+
+    <h2>4. Add your Gemini API key (in the assistant)</h2>
+    <div class="panel">
+      <p>Open the assistant, tap <strong>&#9881; Settings &rarr; AI</strong>, paste your Gemini API key, tap <strong>Save</strong>, then <strong>Test Connection</strong>. Pick your model (default <code>gemini-3.6-flash</code>).</p>
+      <div class="notice warn">
+        <strong>Never commit your API key to GitHub.</strong> The key is stored only in your browser.
+        For production, host a small serverless proxy and set <code>PROXY_URL</code> so the key stays server-side.
+      </div>
+    </div>
+
+    <footer>
+      <p>Created by Ash &#128556; &middot; Universal AI assistant for the web. &middot; See <code>README.md</code> for full setup, updating, and proxy instructions.</p>
+    </footer>
+  </main>
+
+  <script>
+    (function () {
+      var urlInput = document.getElementById("ghurl");
+      var preview = document.getElementById("bmpreview");
+      var dragBm = document.getElementById("dragbm");
+      var VERSION = "1.0.4";
+
+      // Prefill from current origin if this page is itself on GitHub Pages.
+      try {
+        if (location.hostname.endsWith("github.io")) {
+          var base = location.origin + location.pathname.replace(/\/[^\/]*$/, "");
+          urlInput.value = base.replace(/\/+$/, "");
+        }
+      } catch (e) {}
+
+      function buildProd(url) {
+        // Compact, single-line loader. Mirrors bookmarklet.js production version.
+        return 'javascript:(function(){var U="' + url + '",V="' + VERSION + '";' +
+          'if(window.__GEMINI_ASSISTANT__){try{window.__GEMINI_ASSISTANT__.open()}catch(e){}return}' +
+          'if(window.__GEMINI_ASSISTANT_LOADING__)return;window.__GEMINI_ASSISTANT_LOADING__=1;' +
+          'if(!U||U==="YOUR_GITHUB_PAGES_URL_HERE"){window.__GEMINI_ASSISTANT_LOADING__=0;' +
+          'alert("Set your GitHub Pages URL in the bookmarklet.");return}' +
+          'var b=U.replace(/\\/+$/,"");window.__GEMINI_ASSISTANT_BASE__=b;window.__GEMINI_ASSISTANT_VERSION__=V;' +
+          'var s=document.createElement("script");s.src=b+"/assistant.js?v="+encodeURIComponent(V);s.async=1;' +
+          's.onload=function(){window.__GEMINI_ASSISTANT_LOADING__=0};' +
+          's.onerror=function(){window.__GEMINI_ASSISTANT_LOADING__=0;alert("Failed to load assistant.js from "+s.src)};' +
+          '(document.head||document.documentElement).appendChild(s)})();';
+      }
+      function buildDev(url) {
+        return "// Readable loader — replace URL, minify for the bookmark.\n" +
+          '(function(){\n' +
+          '  var GITHUB_SCRIPT_URL = "' + url + '";\n' +
+          '  var VERSION = "' + VERSION + '";\n' +
+          '  if (window.__GEMINI_ASSISTANT__) { try { window.__GEMINI_ASSISTANT__.open(); } catch(e){} return; }\n' +
+          '  if (window.__GEMINI_ASSISTANT_LOADING__) return;\n' +
+          '  window.__GEMINI_ASSISTANT_LOADING__ = true;\n' +
+          '  var base = GITHUB_SCRIPT_URL.replace(/\\/+$/, "");\n' +
+          '  window.__GEMINI_ASSISTANT_BASE__ = base;\n' +
+          '  window.__GEMINI_ASSISTANT_VERSION__ = VERSION;\n' +
+          '  var s = document.createElement("script");\n' +
+          '  s.src = base + "/assistant.js?v=" + encodeURIComponent(VERSION);\n' +
+          '  s.async = true;\n' +
+          '  s.onload = function(){ window.__GEMINI_ASSISTANT_LOADING__ = false; };\n' +
+          '  s.onerror = function(){ window.__GEMINI_ASSISTANT_LOADING__ = false; alert("Failed to load assistant.js"); };\n' +
+          '  (document.head || document.documentElement).appendChild(s);\n' +
+          '})();';
+      }
+
+      function currentUrl() {
+        var v = urlInput.value.trim().replace(/\/+$/, "");
+        return v || "YOUR_GITHUB_PAGES_URL_HERE";
+      }
+      function refresh() {
+        var url = currentUrl();
+        var prod = buildProd(url);
+        preview.textContent = prod;
+        dragBm.setAttribute("href", prod);
+        var status = document.getElementById("urlstatus");
+        if (url === "YOUR_GITHUB_PAGES_URL_HERE") { status.textContent = "Enter your URL to personalize the bookmarklet."; status.style.color = "var(--muted)"; }
+        else { status.textContent = "Ready — bookmarklet points at " + url + "/assistant.js"; status.style.color = "var(--accent)"; }
+      }
+      function copy(text, msg) {
+        var cs = document.getElementById("copystatus");
+        function done() { cs.textContent = msg; setTimeout(function(){ cs.textContent = ""; }, 2000); }
+        if (navigator.clipboard) { navigator.clipboard.writeText(text).then(done, function(){ fallback(text); done(); }); }
+        else { fallback(text); done(); }
+      }
+      function fallback(text) {
+        var ta = document.createElement("textarea"); ta.value = text; document.body.appendChild(ta);
+        ta.select(); try { document.execCommand("copy"); } catch (e) {} ta.remove();
+      }
+
+      urlInput.addEventListener("input", refresh);
+      document.getElementById("copybm").onclick = function(){ copy(buildProd(currentUrl()), "Production bookmarklet copied."); };
+      document.getElementById("copydev").onclick = function(){ copy(buildDev(currentUrl()), "Readable version copied."); };
+      refresh();
+    })();
+  </script>
+</body>
+</html>

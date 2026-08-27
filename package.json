@@ -1,0 +1,13 @@
+{
+  "name": "gemini-web-assistant",
+  "version": "1.0.4",
+  "private": true,
+  "description": "GitHub-hosted universal Gemini AI browser assistant loaded via a tiny bookmarklet. Game/Quiz mode is the primary specialty.",
+  "scripts": {
+    "dev": "serve -l 3000 .",
+    "start": "serve -l 3000 ."
+  },
+  "devDependencies": {
+    "serve": "^14.2.4"
+  }
+}

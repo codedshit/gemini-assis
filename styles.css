@@ -1,0 +1,432 @@
+/* ==========================================================================
+ * styles.css  —  Gemini Web Assistant UI
+ * --------------------------------------------------------------------------
+ * Loaded INTO the assistant's Shadow DOM, so these rules cannot leak onto the
+ * host page and the host page cannot override them. Every selector is scoped
+ * under .ga-panel to stay namespaced even in the fallback (non-shadow) case.
+ *
+ * Aesthetic: compact technical control panel. Signature element = the big,
+ * high-contrast ANSWER card in Game mode. Everything else stays quiet.
+ * ========================================================================== */
+
+:host {
+  all: initial;
+}
+
+/* ---- Design tokens (dark default) ------------------------------------- */
+.ga-panel {
+  --ga-bg: #0e1017;
+  --ga-surface: #151824;
+  --ga-surface-2: #1c2030;
+  --ga-border: #272c3f;
+  --ga-text: #e7e9f2;
+  --ga-muted: #8b91a7;
+  --ga-primary: #6366f1;      /* indigo brand */
+  --ga-primary-ink: #ffffff;
+  --ga-accent: #22d3a5;       /* correct / positive */
+  --ga-danger: #f97066;
+  --ga-warn: #fbbf24;
+  --ga-radius: 16px;
+  --ga-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --ga-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  position: fixed;
+  top: 80px;
+  right: 24px;
+  width: 380px;
+  max-width: 92vw;
+  max-height: 82vh;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--ga-font);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ga-text);
+  background: var(--ga-bg);
+  border: 1px solid var(--ga-border);
+  border-radius: var(--ga-radius);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  touch-action: none;
+}
+
+.ga-panel[data-theme="light"] {
+  --ga-bg: #f7f8fc;
+  --ga-surface: #ffffff;
+  --ga-surface-2: #eef0f7;
+  --ga-border: #d9dcea;
+  --ga-text: #1a1d2b;
+  --ga-muted: #6b7186;
+  --ga-primary: #4f46e5;
+  --ga-accent: #0ea472;
+}
+
+.ga-panel *,
+.ga-panel *::before,
+.ga-panel *::after { box-sizing: border-box; }
+
+/* ---- Header ----------------------------------------------------------- */
+.ga-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 12px;
+  background: linear-gradient(180deg, var(--ga-surface-2), var(--ga-surface));
+  border-bottom: 1px solid var(--ga-border);
+  cursor: move;
+  user-select: none;
+  touch-action: none;
+}
+.ga-brand { font-weight: 700; letter-spacing: 0.2px; white-space: nowrap; }
+.ga-mode-badge {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  padding: 3px 7px;
+  border-radius: 999px;
+  color: var(--ga-primary-ink);
+  background: var(--ga-primary);
+  white-space: nowrap;
+}
+.ga-spacer { flex: 1; }
+.ga-icon {
+  width: 28px; height: 28px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--ga-muted);
+  border-radius: 8px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.ga-icon:hover { background: var(--ga-surface-2); color: var(--ga-text); }
+.ga-icon:active { transform: scale(0.94); }
+
+/* ---- Mode bar --------------------------------------------------------- */
+.ga-modebar {
+  display: flex;
+  gap: 4px;
+  padding: 8px;
+  border-bottom: 1px solid var(--ga-border);
+  background: var(--ga-bg);
+}
+.ga-modebar button {
+  flex: 1;
+  padding: 8px 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ga-muted);
+  background: var(--ga-surface);
+  border: 1px solid var(--ga-border);
+  border-radius: 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+.ga-modebar button:hover { color: var(--ga-text); }
+.ga-modebar button.active {
+  color: var(--ga-primary-ink);
+  background: var(--ga-primary);
+  border-color: var(--ga-primary);
+}
+
+/* ---- Body ------------------------------------------------------------- */
+.ga-body {
+  padding: 14px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  flex: 1;
+  min-height: 0;
+}
+
+/* Minimized: hide everything but header. */
+.ga-panel.ga-minimized .ga-modebar,
+.ga-panel.ga-minimized .ga-body,
+.ga-panel.ga-minimized .ga-resize { display: none; }
+.ga-panel.ga-minimized { height: auto !important; max-height: none; }
+
+/* ---- Sections & labels ------------------------------------------------ */
+.ga-section { display: flex; flex-direction: column; gap: 10px; }
+.ga-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--ga-muted);
+  margin-top: 4px;
+}
+.ga-muted { color: var(--ga-muted); }
+.ga-small { font-size: 12px; }
+
+/* ---- Buttons & inputs ------------------------------------------------- */
+.ga-btn {
+  appearance: none;
+  border: 1px solid var(--ga-primary);
+  background: var(--ga-primary);
+  color: var(--ga-primary-ink);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 9px 13px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: filter 0.15s, transform 0.06s;
+}
+.ga-btn:hover { filter: brightness(1.08); }
+.ga-btn:active { transform: scale(0.97); }
+.ga-btn.secondary {
+  background: var(--ga-surface-2);
+  border-color: var(--ga-border);
+  color: var(--ga-text);
+}
+.ga-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.ga-row > .ga-btn { flex: 1; }
+
+.ga-input, .ga-textarea, .ga-select {
+  width: 100%;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--ga-text);
+  background: var(--ga-surface);
+  border: 1px solid var(--ga-border);
+  border-radius: 10px;
+  padding: 9px 11px;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.ga-textarea { resize: vertical; min-height: 44px; }
+.ga-input:focus, .ga-textarea:focus, .ga-select:focus {
+  border-color: var(--ga-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ga-primary) 25%, transparent);
+}
+.ga-select { appearance: none; background-image: none; }
+
+/* ---- Game: question / choices / answer -------------------------------- */
+.ga-question {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ga-text);
+  background: var(--ga-surface);
+  border: 1px solid var(--ga-border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  min-height: 44px;
+  text-wrap: pretty;
+}
+.ga-choices { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.ga-choices li {
+  padding: 8px 10px;
+  font-size: 13px;
+  border: 1px solid var(--ga-border);
+  border-radius: 8px;
+  background: var(--ga-surface);
+}
+.ga-choices li.correct {
+  border-color: var(--ga-accent);
+  background: color-mix(in srgb, var(--ga-accent) 16%, var(--ga-surface));
+  color: var(--ga-text);
+  font-weight: 700;
+}
+
+/* SIGNATURE ELEMENT: the answer card. */
+.ga-answer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+  font-weight: 800;
+  line-height: 1.15;
+  color: var(--ga-primary-ink);
+  background:
+    radial-gradient(120% 120% at 50% 0%, color-mix(in srgb, var(--ga-primary) 55%, transparent), transparent 70%),
+    var(--ga-surface-2);
+  border: 1px solid color-mix(in srgb, var(--ga-primary) 45%, var(--ga-border));
+  border-radius: 14px;
+  padding: 22px 16px;
+  text-wrap: balance;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+.ga-panel[data-answersize="small"]  .ga-answer { font-size: 22px; padding: 14px; }
+.ga-panel[data-answersize="medium"] .ga-answer { font-size: 30px; }
+.ga-panel[data-answersize="large"]  .ga-answer { font-size: 38px; }
+.ga-conf { font-size: 0.7em; line-height: 1; }
+.ga-explain {
+  font-size: 13px;
+  color: var(--ga-text);
+  background: var(--ga-surface);
+  border: 1px solid var(--ga-border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  text-wrap: pretty;
+}
+
+.ga-manualbox { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+
+/* ---- Status ----------------------------------------------------------- */
+.ga-status { font-size: 12px; color: var(--ga-muted); margin-top: 10px; min-height: 16px; }
+.ga-status.error { color: var(--ga-danger); }
+.ga-status.warn { color: var(--ga-warn); }
+
+/* ---- Chat ------------------------------------------------------------- */
+.ga-chat {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 42vh;
+  overflow-y: auto;
+  padding-right: 2px;
+  margin-bottom: 10px;
+}
+.ga-empty { padding: 24px 8px; text-align: center; }
+.ga-msg { display: flex; flex-direction: column; gap: 4px; max-width: 90%; }
+.ga-msg.user { align-self: flex-end; align-items: flex-end; }
+.ga-msg.assistant { align-self: flex-start; }
+.ga-msg-text {
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: 13.5px;
+  padding: 9px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--ga-border);
+  background: var(--ga-surface);
+}
+.ga-msg.user .ga-msg-text {
+  background: var(--ga-primary);
+  border-color: var(--ga-primary);
+  color: var(--ga-primary-ink);
+}
+.ga-msg-tools button {
+  font-size: 11px;
+  color: var(--ga-muted);
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  padding: 2px 4px;
+}
+.ga-msg-tools button:hover { color: var(--ga-text); }
+.ga-composer { display: flex; flex-direction: column; gap: 8px; }
+
+/* ---- Analyze ---------------------------------------------------------- */
+.ga-result {
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid var(--ga-border);
+  border-radius: 10px;
+  background: var(--ga-surface);
+  max-height: 40vh;
+  overflow-y: auto;
+}
+.ga-filelabel { display: block; font-size: 12px; color: var(--ga-muted); }
+.ga-filelabel input { display: block; margin-top: 6px; font-size: 12px; }
+
+/* ---- Settings --------------------------------------------------------- */
+.ga-tabbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+.ga-tabbar button {
+  flex: 1 0 auto;
+  padding: 7px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ga-muted);
+  background: var(--ga-surface);
+  border: 1px solid var(--ga-border);
+  border-radius: 8px;
+  cursor: pointer;
+}
+.ga-tabbar button.active { color: var(--ga-primary-ink); background: var(--ga-primary); border-color: var(--ga-primary); }
+
+.ga-settings { display: flex; flex-direction: column; gap: 14px; }
+.ga-field { display: flex; flex-direction: column; gap: 6px; }
+.ga-field-label { font-size: 12px; font-weight: 700; color: var(--ga-text); }
+.ga-hint { font-size: 11px; color: var(--ga-muted); line-height: 1.45; }
+.ga-toggle {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; cursor: pointer; user-select: none;
+}
+.ga-toggle input { width: 16px; height: 16px; accent-color: var(--ga-primary); }
+.ga-keyrow { display: flex; gap: 8px; }
+.ga-keyrow .ga-input { flex: 1; }
+.ga-rangeval { font-size: 12px; color: var(--ga-muted); margin-left: 8px; }
+input[type="range"] { accent-color: var(--ga-primary); width: calc(100% - 44px); vertical-align: middle; }
+
+.ga-testresult { font-size: 12px; color: var(--ga-muted); min-height: 15px; }
+.ga-testresult.ok { color: var(--ga-accent); }
+.ga-testresult.error { color: var(--ga-danger); }
+
+.ga-notice {
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--ga-muted);
+  background: var(--ga-surface);
+  border: 1px solid var(--ga-border);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+.ga-notice strong { color: var(--ga-text); }
+
+.ga-version { font-family: var(--ga-mono); font-size: 12px; color: var(--ga-muted); }
+.ga-update { color: var(--ga-accent); font-weight: 700; }
+.ga-uptodate { color: var(--ga-muted); }
+
+.ga-about { text-align: center; padding: 12px 4px; display: flex; flex-direction: column; gap: 8px; }
+.ga-about-title { font-size: 20px; font-weight: 800; }
+.ga-credit { font-weight: 700; color: var(--ga-primary); }
+
+/* ---- Update banner ---------------------------------------------------- */
+.ga-updatebanner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  padding: 8px 12px;
+  background: color-mix(in srgb, var(--ga-accent) 18%, var(--ga-surface));
+  border-bottom: 1px solid var(--ga-border);
+  color: var(--ga-text);
+}
+.ga-updatebanner button {
+  border: 0; cursor: pointer; border-radius: 7px; padding: 4px 8px; font-size: 11px; font-weight: 600;
+}
+.ga-updatebanner button[data-act="reload"] { background: var(--ga-accent); color: #05231a; margin-left: auto; }
+.ga-updatebanner button[data-act="dismiss"] { background: transparent; color: var(--ga-muted); }
+
+/* ---- Resize grip ------------------------------------------------------ */
+.ga-resize {
+  position: absolute;
+  right: 4px; bottom: 4px;
+  width: 18px; height: 18px;
+  cursor: nwse-resize;
+  border-right: 2px solid var(--ga-muted);
+  border-bottom: 2px solid var(--ga-muted);
+  border-bottom-right-radius: 6px;
+  opacity: 0.5;
+  touch-action: none;
+}
+.ga-resize:hover { opacity: 0.9; }
+
+/* ---- Compact mode ----------------------------------------------------- */
+.ga-panel.ga-compact { width: 320px; font-size: 13px; }
+.ga-panel.ga-compact .ga-body { padding: 10px; }
+.ga-panel.ga-compact .ga-answer { padding: 14px; }
+
+/* ---- Scrollbars (kept subtle) ----------------------------------------- */
+.ga-body::-webkit-scrollbar, .ga-chat::-webkit-scrollbar, .ga-result::-webkit-scrollbar { width: 8px; }
+.ga-body::-webkit-scrollbar-thumb, .ga-chat::-webkit-scrollbar-thumb, .ga-result::-webkit-scrollbar-thumb {
+  background: var(--ga-border); border-radius: 8px;
+}
+
+/* ---- iPad / touch responsiveness -------------------------------------- */
+@media (max-width: 640px) {
+  .ga-panel {
+    right: 8px; left: 8px; top: 12px;
+    width: auto; max-width: none; max-height: 88vh;
+  }
+  .ga-btn, .ga-icon { min-height: 40px; }        /* touch targets */
+  .ga-modebar button { min-height: 40px; }
+  .ga-panel[data-answersize="large"] .ga-answer { font-size: 32px; }
+}
